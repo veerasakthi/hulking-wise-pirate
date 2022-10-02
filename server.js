@@ -1,29 +1,22 @@
-// server.js
-// where your node app starts
-
-// init project
 const express = require('express');
-const morgan = require('morgan');
-const app = express();
 const bodyParser = require('body-parser');
 
-app.use(bodyParser());
-app.use(morgan());
+const santaRouter = require('./app/router');
 
-// we've started you off with Express,
-// but feel free to use whatever libs or frameworks you'd like through `package.json`.
+const app = express();
 
-// http://expressjs.com/en/starter/static-files.html
+app.use(bodyParser.json());
+
 app.use(express.static('public'));
 
-// http://expressjs.com/en/starter/basic-routing.html
 app.get('/', (request, response) => {
   response.sendFile(__dirname + '/views/index.html');
 });
+
+// route mapping
+app.use('/', santaRouter);
 
 // listen for requests :)
 const listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
-
-// veera code starts here
