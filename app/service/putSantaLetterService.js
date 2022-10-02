@@ -26,6 +26,13 @@ const putSantaLetter = transaction(async (req) => {
         return validationResult;
     }
 
+    // child validation
+    const userResult = userValidationCheck(reqBody);
+
+    if(userResult?.isError){
+        return userResult;
+    }
+
     let toBeStored = [];
     let santaLetterList = myCache.get( "santaLetters" );
 
@@ -60,6 +67,54 @@ function validationCheck(reqBody){
         let msg = "userName or wish cannot be Empty!";
         return errorResponse(msg, {});
     }
+
+}
+
+function userValidationCheck(reqBody){
+    const fs = require('fs');
+
+    let usersList = JSON.parse(fs.readFileSync('app/resource/users.json', 'utf8'));
+    let profileList = JSON.parse(fs.readFileSync('app/resource/userProfiles.json', 'utf8'));
+    // @ts-ignore
+    // console.log(usersList);
+    // console.log(profileList);
+
+//    const userExist =  usersList.some(function(user) {
+//         return user.username == reqBody.userName;
+//     }); 
+
+    const userInfo = usersList.find(user => user.username == reqBody.userName);
+
+    if(userInfo){
+
+        const profileInfo = profileList.find(profile => profile.userUid == userInfo.uid);
+
+        if(getAge(profileInfo.birthdate) <= 10){
+            return successResponse("", {});
+        }else{
+            let msg = "child is more than 10years old ";
+            return errorResponse(msg, {});
+        }
+
+    }else{
+
+        let msg = "user doesn't exist !";
+        return errorResponse(msg, {});
+
+    }
+    
+}
+
+function getAge(birthDateString) {
+
+    var today = new Date();
+    var birthDate = new Date(birthDateString);
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
 
 }
 
