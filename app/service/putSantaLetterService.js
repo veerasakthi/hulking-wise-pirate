@@ -11,6 +11,8 @@ const { transaction } = require('../utility/appUtils');
  */
 const putSantaLetter = transaction(async (req) => {
 
+    console.log(req.body);
+
     return "data fail";
 
 });

@@ -45,7 +45,8 @@ function asyncAjax(url, data){
           $.ajax({
               url: url,
               type: "POST",
-              data: data,
+              data: JSON.stringify(data),
+              contentType:"application/json; charset=utf-8",
               dataType: "json",
               beforeSend: function() {
               },
