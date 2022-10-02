@@ -16,10 +16,8 @@ const init = asyncCatch(async (req, res, next) => {
     const result = await _service.putSantaLetter(req, next);
 
     // return response
-    return res.status(200).json({
-        statusCode: 401,
-        status: "error"
-    })
+    return res.status(200).json(result);
+
 });
 
 module.exports = {

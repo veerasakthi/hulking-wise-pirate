@@ -11,7 +11,18 @@ $("#submit-letter").click(async function() {
 
     const result = await storeSantaLetter(reqBody)
 
-    alert(result);
+    // alert(result);
+    if(result.isError){
+
+      $("#successMsg").hide();
+      $("#errorMsg").text(result.message).show();
+
+    }else{
+
+      $("#successMsg").text(result.message).show();
+      $("#errorMsg").hide();
+
+    }
     
     // $.ajax({url: "/test", success: function(result){
     //   alert(JSON.stringify(result));
@@ -27,12 +38,12 @@ async function storeSantaLetter(reqBody){
 
     const result = await asyncAjax(PUT_LETTER_URL, reqBody);
 
-    return JSON.stringify(result);
+    return result;
 
   } catch(e){
 
       console.log(e);
-      return "ERROR OCCURED SORRY!";
+      $("#errorMsg").text("ERROR OCCURED SORRY!");
 
   }
 
