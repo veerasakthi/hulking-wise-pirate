@@ -2,10 +2,11 @@
 "use strict";
 const fs = require('fs');
 const path = require('path');
-const mailer = require('nodemailer');
-const { transaction } = require('../../app/utility/appUtils');
+const { transaction } = require('../../utility/appUtils');
+const _CONSTANTS = require('../../utility/constants');
 
 const { myCache } = require('../../app/service/putSantaLetterService');
+const { mailSender } = require('../../utility/mailSender');
 
 let usersList = JSON.parse(fs.readFileSync('app/resource/users.json', 'utf8'));
 let profileList = JSON.parse(fs.readFileSync('app/resource/userProfiles.json', 'utf8'));
@@ -20,57 +21,52 @@ const putSantaMail = transaction(async (req) => {
 
     console.log("cron mail started ###");
 
-    let santaLetterList = myCache.get( "santaLetters" );
-
+    // get all santa letters
+    let santaLetterList = myCache.get(_CONSTANTS.SANTA_LETTER_KEY);
+    
     if(!santaLetterList){
-        console.log("NO EMAILS TO PROCESS!");
+        console.log(_CONSTANTS.NO_EMAILS_TO_PROCESS);
         return "SKIP...";
     }
 
+    // filter the unsent letters to santa
     let unsentLetters = santaLetterList.filter(function (letter) {
         return letter.emailFlag == 0 ;
     });
 
     if(!unsentLetters){
-        console.log("NO EMAILS TO PROCESS!");
+        console.log(_CONSTANTS.NO_EMAILS_TO_PROCESS);
         return "SKIP...";
     }
 
+    // MAIL SENDING CODE
     unsentLetters.forEach(async letter => {
     
-    const userInfo = usersList.find(user => user.username == letter.userName);
-    const profileInfo = profileList.find(profile => profile.userUid == userInfo.uid);
+        const userInfo = usersList.find(user => user.username == letter.userName);
+        const profileInfo = profileList.find(profile => profile.userUid == userInfo.uid);
 
-    // console.log(userInfo);
-    // console.log(profileInfo);
+        const emailSubject = `wish from child ${userInfo.username}`
+        const emailBody = `
+        Dear Santa
 
-    const emailSubject = `wish from child ${userInfo.username}`
-    const emailBody = `
-    Dear Santa
+        wish from child ${userInfo.username} 
+        child's address ${profileInfo.address} 
 
-    wish from child ${userInfo.username} 
-    child's address ${profileInfo.address} 
+        child's wish is
+        ${letter.wish} 
 
-    child's wish is
-    ${letter.wish} 
+        Thank you...
+        -----------------------
+        `
 
-    Thank you...
-    -----------------------
-    `
-
-    // console.log(`
-    // ${emailSubject}
-    // ${emailBody}
-    // `)
-
-    // send email
-    await sendEmail(emailSubject, emailBody);
+        // send email
+        await mailSender(emailSubject, emailBody);
 
     });
 
 
     // update email sent flag process
-    let latestSantaLetterList = myCache.get( "santaLetters" );  
+    let latestSantaLetterList = myCache.get(_CONSTANTS.SANTA_LETTER_KEY);  
     
     unsentLetters.forEach(async letter => {
         //Find index of specific object using findIndex method.    
@@ -81,39 +77,12 @@ const putSantaMail = transaction(async (req) => {
     })
 
     // update the cache
-    myCache.set( "santaLetters", latestSantaLetterList );
+    myCache.set(_CONSTANTS.SANTA_LETTER_KEY, latestSantaLetterList );
 
     return "SUCCESS... ";
 
 });
 
-function sendEmail(subject, body){
-
-    return new Promise(function(resolve, reject) {
-
-        // Creating a transporter
-        const transporter = mailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            auth: {
-                user: 'arely.hauck@ethereal.email',
-                pass: 'FDuBZDV7aF5PgtGq2d'
-            }
-        });
-
-        //sending the email
-        transporter.sendMail({
-            from: 'do_not_reply@northpole.com',
-            to: 'santa@northpole.com',
-            subject: subject,
-            text: body
-        })
-        .then(data => { resolve(data) })
-        .catch(error => {reject(error)});
-
-    });
-
-}
 
 module.exports = {
     putSantaMail

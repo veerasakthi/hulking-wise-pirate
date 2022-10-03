@@ -1,7 +1,7 @@
 // @ts-check
 const path = require('path');
 const _service = require('../service/santaMailService');
-const { asyncCatch } = require('../../app/utility/appUtils');
+const { asyncCatch } = require('../../utility/appUtils');
 
 /**
  * init
