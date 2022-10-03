@@ -1,12 +1,12 @@
 const express = require('express');
+const cron = require('node-cron');
 const bodyParser = require('body-parser');
 
 const santaRouter = require('./app/router');
+const putSantaLetter = require('./cron/controller/santaMailController');
 
 const app = express();
-
 app.use(bodyParser.json());
-
 app.use(express.static('public'));
 
 app.get('/', (request, response) => {
@@ -15,6 +15,9 @@ app.get('/', (request, response) => {
 
 // route mapping
 app.use('/', santaRouter);
+
+// batch process
+cron.schedule('* * * * *', putSantaLetter.init);
 
 // listen for requests :)
 const listener = app.listen(process.env.PORT || 3000, function () {

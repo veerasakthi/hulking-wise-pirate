@@ -7,7 +7,7 @@ const NodeCache = require( "node-cache" );
 const myCache = new NodeCache();
 
 /**
- * getAllMasterService
+ * putSantaLetter
  *
  * @param {any} req http request
  * @return {any} santa gift response
@@ -64,7 +64,7 @@ function validationCheck(reqBody){
     const wish = reqBody.wish;
 
     if(!userName || !wish){
-        let msg = "userName or wish cannot be Empty!";
+        let msg = "username or wish cannot be Empty!";
         return errorResponse(msg, {});
     }
 
