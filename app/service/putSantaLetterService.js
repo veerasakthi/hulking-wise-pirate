@@ -9,6 +9,7 @@ let usersList = JSON.parse(fs.readFileSync('app/resource/users.json', 'utf8'));
 let profileList = JSON.parse(fs.readFileSync('app/resource/userProfiles.json', 'utf8'));
 
 const { transaction } = require('../utility/appUtils');
+const response = require('../utility/responseHandler');
 
 const NodeCache = require( "node-cache" );
 const myCache = new NodeCache();
@@ -56,11 +57,11 @@ const putSantaLetter = transaction(async (req) => {
     if(insertResult){
 
         let msg = "Dream sent to Santa Successfully!";
-        return successResponse(msg, {});
+        return response.success(msg, {});
         
     }else{
         let msg = "Error Occurred Sorry!";
-        return errorResponse(msg, {});
+        return response.error(msg, {});
     }
 
 });
@@ -73,7 +74,7 @@ function validationCheck(reqBody){
 
     if(!userName || !wish){
         let msg = "username or wish cannot be Empty!";
-        return errorResponse(msg, {});
+        return response.error(msg, {});
     }
 
 }
@@ -87,16 +88,16 @@ function userValidationCheck(reqBody){
         const profileInfo = profileList.find(profile => profile.userUid == userInfo.uid);
 
         if(getAge(profileInfo.birthdate) <= 10){
-            return successResponse("", {});
+            return response.success("", {});
         }else{
-            let msg = "child is more than 10years old ";
-            return errorResponse(msg, {});
+            let msg = "child is more than 10 years old ";
+            return response.error(msg, {});
         }
 
     }else{
 
         let msg = "user doesn't exist !";
-        return errorResponse(msg, {});
+        return response.error(msg, {});
 
     }
     
@@ -113,22 +114,6 @@ function getAge(birthDateString) {
     }
     return age;
 
-}
-
-function successResponse(msg, data){
-    return {
-        isError : false,
-        message : msg,
-        data : data
-    }
-}
-
-function errorResponse(msg, data){
-    return {
-        isError : true,
-        message : msg,
-        data : data
-    }
 }
 
 module.exports = {
