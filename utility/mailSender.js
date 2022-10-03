@@ -1,6 +1,7 @@
 // @ts-check
 const path = require('path');
 const mailer = require('nodemailer');
+const _CONSTANTS = require('../utility/constants');
 
 /**
  * MAIL SENDER
@@ -11,22 +12,40 @@ const mailer = require('nodemailer');
  */
 function mailSender(subject, body){
 
+    const EMAIL_PORT = process.env.EMAIL_PORT;
+    const EMAIL_HOST = process.env.EMAIL_HOST;
+    const EMAIL_AUTH_USER = process.env.EMAIL_AUTH_USER;
+    const EMAIL_AUTH_PASS = process.env.EMAIL_AUTH_PASS;
+    const EMAIL_FROM = process.env.EMAIL_FROM;
+    const EMAIL_TO = process.env.EMAIL_TO;
+
+    if(!EMAIL_PORT 
+        || !EMAIL_HOST
+        || !EMAIL_AUTH_USER
+        || !EMAIL_AUTH_PASS
+        || !EMAIL_FROM
+        || !EMAIL_TO
+        ){
+            // throw error when env doesnot exist
+            throw new Error(_CONSTANTS.ENVIRONMENT_VARIABLES_NOT_SET);
+    }
+
     return new Promise(function(resolve, reject) {
 
         // Creating a transporter
         const transporter = mailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
+            host: EMAIL_HOST?.toString(),
+            port: Number(EMAIL_PORT),
             auth: {
-                user: 'arely.hauck@ethereal.email',
-                pass: 'FDuBZDV7aF5PgtGq2d'
+                user: EMAIL_AUTH_USER?.toString(),
+                pass: EMAIL_AUTH_PASS?.toString()
             }
         });
 
         //sending the email
         transporter.sendMail({
-            from: 'do_not_reply@northpole.com',
-            to: 'santa@northpole.com',
+            from: EMAIL_FROM?.toString(),
+            to: EMAIL_TO?.toString(),
             subject: subject,
             text: body
         })

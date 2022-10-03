@@ -9,6 +9,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+// require env variables
+require('dotenv').config();
+
 app.get('/', (request, response) => {
   response.sendFile(__dirname + '/views/index.html');
 });
