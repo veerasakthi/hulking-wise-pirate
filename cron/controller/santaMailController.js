@@ -15,7 +15,7 @@ const init = asyncCatch(async (req, next) => {
 
     const result = await _service.putSantaMail(req, next);
 
-    console.log("success every 1 min"+ new Date());
+    console.log(result + new Date());
 
 });
 
