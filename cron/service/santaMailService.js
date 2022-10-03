@@ -56,7 +56,6 @@ const putSantaMail = transaction(async (req) => {
 
     Thank you...
     -----------------------
-    </html>
     `
 
     // console.log(`
