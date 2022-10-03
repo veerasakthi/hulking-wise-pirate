@@ -17,7 +17,7 @@ app.get('/', (request, response) => {
 app.use('/', santaRouter);
 
 // batch process
-cron.schedule('* * * * *', putSantaLetter.init);
+cron.schedule('0,15,30,45 * * * * *', putSantaLetter.init);
 
 // listen for requests :)
 const listener = app.listen(process.env.PORT || 3000, function () {

@@ -40,7 +40,8 @@ function transaction(serviceFn) {
             // TODO rollback transaction if required
             
             // handle to common error handler
-            next(err);
+            // next(err);
+            throw new Error(err);
         }
         finally {
 

@@ -1,6 +1,13 @@
 // @ts-check
 "use strict";
+const fs = require('fs');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+
+
+let usersList = JSON.parse(fs.readFileSync('app/resource/users.json', 'utf8'));
+let profileList = JSON.parse(fs.readFileSync('app/resource/userProfiles.json', 'utf8'));
+
 const { transaction } = require('../utility/appUtils');
 
 const NodeCache = require( "node-cache" );
@@ -18,6 +25,7 @@ const putSantaLetter = transaction(async (req) => {
 
     console.log(reqBody);
     reqBody.emailFlag = 0;
+    reqBody.letterId = uuidv4();
 
     // input validation
     const validationResult = validationCheck(reqBody);
@@ -71,17 +79,6 @@ function validationCheck(reqBody){
 }
 
 function userValidationCheck(reqBody){
-    const fs = require('fs');
-
-    let usersList = JSON.parse(fs.readFileSync('app/resource/users.json', 'utf8'));
-    let profileList = JSON.parse(fs.readFileSync('app/resource/userProfiles.json', 'utf8'));
-    // @ts-ignore
-    // console.log(usersList);
-    // console.log(profileList);
-
-//    const userExist =  usersList.some(function(user) {
-//         return user.username == reqBody.userName;
-//     }); 
 
     const userInfo = usersList.find(user => user.username == reqBody.userName);
 
@@ -135,5 +132,6 @@ function errorResponse(msg, data){
 }
 
 module.exports = {
-    putSantaLetter
+    putSantaLetter,
+    myCache
 }
